@@ -25,12 +25,7 @@ const port = process.env.PORT;
 const app = express();
 
 // Add middlewares to enable cors and json body parsing
-app.use(cors({
-  origin: "https://merry-buttercream-88f52d.netlify.app/",
-  methods: ["GET", "POST"], 
-  allowedHeaders: ["*"], 
-}));
-
+app.use(cors());
 app.use(express.json());
 
 
@@ -69,10 +64,10 @@ app.get("/", (req, res) => {
 app.get("/happythoughts", async (req, res) => {
   try {
     const happyThoughts = await HappyThought.find().sort({createdAt: "desc"}).limit(20).exec();
-    res.json(happyThoughts)
+    res.status(200).json(happyThoughts);
   } catch (error) {
     console.error('Error retrieving thoughts', error);
-      res.status(500).send('Server error');
+      res.status(400).send('Server error');
   }
 });
 
@@ -80,7 +75,7 @@ app.get("/happythoughts", async (req, res) => {
 app.post("/happythoughts", async (req, res) => {
   try{
     const { message } = req.body;
-    const newHappyThought = await new HappyThought ({ message }).save();
+    const newHappyThought = await new HappyThought({ message }).save();
 
     res.status(201).json(newHappyThought);
   } catch(error) {
@@ -91,13 +86,12 @@ app.post("/happythoughts", async (req, res) => {
 // Post a happy thought
 app.post("/happythoughts/:thoughtId/like", async (req, res) => {
   try {
-    const { id } = req.params;
+    const { thoughtId } = req.params;
 
-    // Uppdatera likes för den tanke som matchar ID
-    const updatedThought = await Thought.findByIdAndUpdate(
-      id,
-      { $inc: { hearts: 1 } }, // Incrementera hearts med 1
-      { new: true } // Returnera det uppdaterade dokumentet
+    const updatedThought = await HappyThought.findByIdAndUpdate(
+      thoughtId,
+      { $inc: { hearts: 1 } }, 
+      { new: true }
     );
 
     if (!updatedThought) {
