@@ -65,8 +65,8 @@ app.get("/happythoughts", async (req, res) => {
     const happyThoughts = await HappyThought.find().sort({createdAt: "desc"}).limit(20).exec();
     res.status(200).json(happyThoughts);
   } catch (error) {
-    console.error('Error retrieving thoughts', error);
-      res.status(400).send('Server error');
+    console.error("Error retrieving thoughts", error);
+      res.status(400).send("Server error");
   }
 });
 
@@ -78,15 +78,18 @@ app.post("/happythoughts", async (req, res) => {
 
     res.status(201).json(newHappyThought);
   } catch(error) {
-    res.status(400).json({message: "Could not save thought", errors: error.err.errors})
+    res.status(400).json({
+      message: "Could not save thought", 
+      errors: error.err.errors
+    });
   }
 });
 
 // Like a happy thought
-app.post("/happythoughts/:thoughtId/like", async (req, res) => {
-  try {
-    const { thoughtId } = req.params._id;
+app.patch("/happythoughts/:thoughtId/like", async (req, res) => {
+  const { thoughtId } = req.params;
 
+  try {  
     const updatedThought = await HappyThought.findByIdAndUpdate(
       thoughtId,
       { $inc: { hearts: 1 } }, 
@@ -94,12 +97,21 @@ app.post("/happythoughts/:thoughtId/like", async (req, res) => {
     );
 
     if (!updatedThought) {
-      return res.status(404).json({ success: false, message: 'Thought not found' });
+      return res.status(404).json({ 
+        success: false, 
+        message: "Thought not found" 
+      });
     }
 
-    res.status(200).json({ success: true, response: updatedThought });
+    res.status(200).json({ 
+      success: true, 
+      response: updatedThought 
+    });
   } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
+    res.status(400).json({ 
+      success: false, 
+      error: error.message 
+    });
   }
 });
 
