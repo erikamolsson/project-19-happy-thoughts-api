@@ -86,7 +86,7 @@ app.post("/happythoughts", async (req, res) => {
 });
 
 // Like a happy thought
-app.patch("/happythoughts/:id/like", async (req, res) => {
+app.post("/happythoughts/:id/like", async (req, res) => {
   const { id } = req.params;
 
   try {  
